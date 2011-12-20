@@ -2,6 +2,7 @@ from base64 import b64encode
 import gzip
 import sys
 import urllib
+import re
 try:
     import urllib2
 except ImportError:
@@ -84,6 +85,12 @@ class AmazonCall(object):
         kwargs['Version'] = self.Version
         kwargs['AWSAccessKeyId'] = self.AWSAccessKeyId
         kwargs['Service'] = "AWSECommerceService"
+        
+        for arg in kwargs:
+            if re.match(r'Item_(\d+)_(OfferListingId|Quantity)',str(arg)) != None:
+                new_arg_name = arg.replace('_','.')
+                kwargs[new_arg_name] = kwargs[arg]
+                kwargs.pop(arg)
 
         if self.Style:
             kwargs['Style'] = self.Style
